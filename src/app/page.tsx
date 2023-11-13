@@ -1,9 +1,9 @@
 import Image from "next/image";
 import styles from "./page.module.css";
-import { algoliaDB } from "@/lib/algoliaConn";
+import airtableBase from "@/lib/airtableConn";
 
 export default function Home() {
-  console.log(algoliaDB);
+  console.log(airtableBase);
 
   return (
     <main className={styles.main}>
