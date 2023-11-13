@@ -1,7 +1,10 @@
 import Image from "next/image";
 import styles from "./page.module.css";
+import { algoliaDB } from "@/lib/algoliaConn";
 
 export default function Home() {
+  console.log(algoliaDB);
+
   return (
     <main className={styles.main}>
       <div className={styles.description}>
