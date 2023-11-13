@@ -1,11 +1,10 @@
-import { NextResponse } from "next/server";
-import { NextApiRequest } from "next";
+import { NextResponse, NextRequest } from "next/server";
 
-export async function GET(request: NextApiRequest) {
-    try {
-        return NextResponse.json({ ok: "ok" });
-    } catch (error) {
-        console.error(error);
-        return NextResponse.json({ error });
-    }
+export async function GET(request: NextRequest) {
+  try {
+    return NextResponse.json({ ok: "ok" });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error });
+  }
 }
