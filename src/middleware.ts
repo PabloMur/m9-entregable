@@ -8,12 +8,13 @@ export async function middleware(request: NextRequest) {
   if (excludedUrls.includes(url)) {
     return NextResponse.next();
   } else if (!excludedUrls.includes(url)) {
-    const token = "hola soy el token";
-    console.log(authorization);
+    const token = authorization?.split(" ")[1];
+    console.log("el token es necesario en este caso");
+
     console.log(token);
   } else {
     return NextResponse.json({
-      message: "El email es necesario",
+      message: "El token es necesario",
     });
   }
 }

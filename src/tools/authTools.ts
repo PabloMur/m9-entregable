@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { parseISO, isAfter, isBefore } from "date-fns";
+import { parseISO, isAfter } from "date-fns";
 
 export function isCodeExpired(date: any) {
   //o sea que nos retorna true en caso de que ahora sea DESPUES de la fecha de vencimiento
