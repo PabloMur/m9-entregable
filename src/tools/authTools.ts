@@ -1,6 +1,11 @@
 import jwt from "jsonwebtoken";
+import { parseISO, isAfter, isBefore } from "date-fns";
 
-import { parseISO, isAfter } from "date-fns";
+export function isCodeExpired(date: any) {
+  //o sea que nos retorna true en caso de que ahora sea DESPUES de la fecha de vencimiento
+  //por ende nos sirve para saber si un codigo esta vencido o no
+  return isAfter(new Date(), date);
+}
 
 export function isValidToken(token: string, secret: string) {
   try {

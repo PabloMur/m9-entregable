@@ -20,12 +20,6 @@ export class Auth {
     this.ref.update(this.data);
   }
 
-  isCodeexpired() {
-    const now = new Date();
-    const expires = this.data.expires.toDate();
-    return isAfter(now, expires);
-  }
-
   static async findByEmail(email: string) {
     const cleanEmail = email.trim().toLocaleLowerCase();
     const results = await collection.where("email", "==", cleanEmail).get();
@@ -36,7 +30,7 @@ export class Auth {
       newAuth.data = founded.data();
       return newAuth;
     } else {
-      return null;
+      return false;
     }
   }
 
@@ -87,6 +81,23 @@ export class Auth {
       auth.data.email = email;
       await auth.pushData();
       return auth;
+    }
+  }
+
+  static async updateExpiration(code: number, date: any, email: string) {
+    try {
+      const auth = await this.findByEmail(email);
+
+      if (auth) {
+        auth.data.code = code;
+        auth.data.expiresAt = date;
+        await auth.pushData();
+      }
+
+      return auth;
+    } catch (error) {
+      console.error(error);
+      return error;
     }
   }
 }
