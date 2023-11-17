@@ -5,8 +5,8 @@ import { AuthController } from "@/controllers/AuthController";
 
 export async function POST(request: NextRequest) {
   try {
-    const checkEmail = await AuthController.sendCode(request);
-    return NextResponse.json({ email: checkEmail });
+    const response = await AuthController.sendCode(request);
+    return NextResponse.json({ response });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error });

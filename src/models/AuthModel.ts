@@ -44,7 +44,6 @@ export class Auth {
     const newAuthSnap = await collection.add(data);
     const newAuth = new Auth(newAuthSnap.id);
     newAuth.data = data;
-
     return newAuth;
   }
 
