@@ -10,11 +10,12 @@ export function isCodeExpired(date: any) {
 export function isValidToken(token: string, secret: string) {
   try {
     const decoded = jwt.verify(token, secret) as any;
+
     const expiresAt = parseISO(decoded.expiresAt);
 
     return isAfter(Date.now(), expiresAt);
   } catch (error) {
-    return false;
+    return error;
   }
 }
 

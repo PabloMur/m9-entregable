@@ -138,18 +138,23 @@ export class User {
     }
   }
 
-  static async updateUserField(userId: string, field: string, value: any) {
+  static async updateUserField(email: string, field: string, value: any) {
     try {
-      const results = await collection.doc(userId).get();
-      if (results.exists) {
-        const user = new User(results.id);
-        user.data = results.data();
+      const querySnapshot = await collection.where("email", "==", email).get();
+      if (!querySnapshot.empty) {
+        // Tomar el primer documento ya que el correo electrónico debería ser único
+        const userDoc = querySnapshot.docs[0];
+
+        const user = new User(userDoc.id);
+        user.data = userDoc.data();
+
+        // Actualizar el campo deseado
         user.data[field] = value;
+
+        // Guardar los cambios en la base de datos
         await user.pushData();
+
         return user.data;
-      } else {
-        console.error("El usuario no existe");
-        throw new Error("El usuario no existe");
       }
     } catch (err) {
       console.error("Falló al actualizar usuario:", err);

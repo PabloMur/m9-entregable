@@ -20,8 +20,30 @@ export class UserController {
 
   static async updateUser(request: NextRequest) {
     try {
-      const { userId, field, value } = await request.json();
-      const updatedUser = await User.updateUserField(userId, field, value);
+      const email = request.headers.get("user-email") as any;
+      const { field, value } = await request.json();
+      const updatedUser = await User.updateUserField(email, field, value);
+
+      if (updatedUser) {
+        return { message: "User updated successfully", user: updatedUser };
+      } else {
+        return { message: "User not found" };
+      }
+    } catch (error) {
+      console.error(error);
+      return { error: "Internal server error" };
+    }
+  }
+
+  static async updateUserAddress(request: NextRequest) {
+    try {
+      const email = request.headers.get("user-email") as any;
+      const { newAddress } = await request.json();
+      const updatedUser = await User.updateUserField(
+        email,
+        "address",
+        newAddress
+      );
 
       if (updatedUser) {
         return { message: "User updated successfully", user: updatedUser };
@@ -57,6 +79,4 @@ export class UserController {
       return { error: "Internal server error" };
     }
   }
-
-  // Agrega más métodos según tus necesidades
 }
