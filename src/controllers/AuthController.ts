@@ -8,26 +8,20 @@ import {
 } from "@/tools/emailSender";
 import { NextRequest } from "next/server";
 
-//resta hacer que se compruebe el vencimiento del code y si esta vencido que genere un code nuevos
-
 export class AuthController {
   static async sendCode(request: NextRequest) {
     try {
       const { email } = await request.json();
-      const userFounded = await Auth.findByEmail(email);
-
       let code = generateRandom5DigitNumber();
       const expiresAt = generateExpirationDate();
 
+      const userFounded = await Auth.findByEmail(email);
+
       if (!userFounded) {
-        await Auth.createAuth({
-          email,
-          code,
-          expiresAt,
-        });
-        await User.createUser({
-          email,
-        });
+        await Promise.all([
+          Auth.createAuth({ email, code, expiresAt }),
+          User.createUser({ email }),
+        ]);
       } else {
         code = userFounded.data.code;
       }
@@ -47,15 +41,15 @@ export class AuthController {
 
       if (authFound) {
         const { expiresAt } = authFound.data;
-        const isExpired = isCodeExpired(expiresAt);
 
-        if (isExpired) {
+        if (isCodeExpired(expiresAt)) {
           const newCode = generateRandom5DigitNumber();
           const newExpirationDate = generateExpirationDate();
 
           await Auth.updateExpiration(newCode, newExpirationDate, email);
         }
-
+        const newCode = generateRandom5DigitNumber();
+        await Auth.updateCode(newCode, email);
         const token = generateToken(authFound);
         return { token };
       }

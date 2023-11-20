@@ -1,4 +1,3 @@
-// pages/api/sync.js
 import { algoliaDB } from "@/lib/algoliaConn";
 import airtableBase from "@/lib/airtableConn";
 import { NextRequest, NextResponse } from "next/server";

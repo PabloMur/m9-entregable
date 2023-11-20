@@ -1,6 +1,8 @@
 import { User } from "@/models/UserModel";
 import { firestore } from "@/lib/firebaseConn";
 
+const ORDER_COLLECTION = "order";
+
 export class Order {
   ref: FirebaseFirestore.DocumentReference;
   data: any;
@@ -8,7 +10,7 @@ export class Order {
 
   constructor(id: string) {
     this.id = id;
-    this.ref = firestore.collection("order").doc(id);
+    this.ref = firestore.collection(ORDER_COLLECTION).doc(id);
   }
 
   async pullData() {
@@ -23,18 +25,24 @@ export class Order {
   async findUserEmail() {
     const userId = this.data.userId;
     const user = await User.findByUserId(userId);
-    return user.data.email;
+
+    return user ? user.data.email : null;
   }
 
   static async createNewOrder(newOrderData: any = {}) {
-    const newOrderSnap = await firestore.collection("order").add(newOrderData);
+    const newOrderSnap = await firestore
+      .collection(ORDER_COLLECTION)
+      .add(newOrderData);
     const newOrder = new Order(newOrderSnap.id);
     newOrder.data = newOrderData;
     return newOrder;
   }
 
   static async findById(orderId: string) {
-    const orderSnap = await firestore.collection("order").doc(orderId).get();
+    const orderSnap = await firestore
+      .collection(ORDER_COLLECTION)
+      .doc(orderId)
+      .get();
 
     if (orderSnap.exists) {
       const myOrder = new Order(orderId);

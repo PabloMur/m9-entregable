@@ -7,9 +7,7 @@ import { AuthController } from "@/controllers/AuthController";
 export async function POST(request: NextRequest) {
   try {
     const response = await AuthController.generateToken(request);
-    return NextResponse.json({
-      response,
-    });
+    return NextResponse.json({ response });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error });

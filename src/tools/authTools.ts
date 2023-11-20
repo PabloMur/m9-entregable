@@ -17,6 +17,16 @@ export function isValidToken(token: string, secret: string) {
     return false;
   }
 }
+
+export function decodeToken(token: string) {
+  try {
+    const decoded = jwt.decode(token);
+    return decoded;
+  } catch (error) {
+    return false;
+  }
+}
+
 export function generateToken(data: any) {
   const secret = process.env.SECRET as any;
   const payload = {
