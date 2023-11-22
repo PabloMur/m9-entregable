@@ -18,6 +18,22 @@ export class UserController {
     }
   }
 
+  static async getMeOrders(request: NextRequest) {
+    try {
+      const email = request.headers.get("user-email") as string;
+      const user = await User.findByUserEmail(email);
+
+      if (user) {
+        return { orders: user.data.orders };
+      } else {
+        return { message: "User not found" };
+      }
+    } catch (error) {
+      console.error(error);
+      return { error: "Internal server error" };
+    }
+  }
+
   static async updateUser(request: NextRequest) {
     try {
       const email = request.headers.get("user-email") as any;
