@@ -29,6 +29,23 @@ export class Order {
     return user ? user.data.email : null;
   }
 
+  static async getUserOrders(userId: string) {
+    const userOrders = await firestore
+      .collection(ORDER_COLLECTION)
+      .where("userID", "==", userId)
+      .get();
+
+    return userOrders.docs.map((docSnap) => {
+      const orderData = docSnap.data();
+      return {
+        orderId: orderData.id,
+        productId: orderData.productId,
+        status: orderData.status,
+        date: orderData.date,
+      };
+    });
+  }
+
   static async createNewOrder(newOrderData: any = {}, productId: string) {
     const orderData = {
       ...newOrderData,
@@ -36,9 +53,12 @@ export class Order {
       status: "pending",
       date: new Date(),
     };
+
     const newOrderSnap = await firestore
       .collection(ORDER_COLLECTION)
       .add(orderData);
+    const userData = await User.findByUserId(newOrderData.userID);
+
     const newOrder = new Order(newOrderSnap.id);
     newOrder.data = orderData;
     return newOrder;
@@ -57,5 +77,9 @@ export class Order {
     } else {
       throw new Error("La orden no existe");
     }
+  }
+  static async updateOrderStatus(orderId: string) {
+    const orderRef = firestore.collection(ORDER_COLLECTION).doc(orderId);
+    await orderRef.update({ status: "paid" });
   }
 }

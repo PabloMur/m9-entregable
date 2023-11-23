@@ -34,5 +34,5 @@ export async function middleware(request: NextRequest) {
 
 //urls que si necesitan de un token
 export const config = {
-  matcher: ["/api/me/:path*"],
+  matcher: ["/api/me/:path*", "/api/order"],
 };

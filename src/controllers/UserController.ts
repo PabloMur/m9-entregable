@@ -1,6 +1,7 @@
 // controllers/userController.js
 import { User } from "@/models/UserModel";
 import { NextRequest } from "next/server";
+import { OrderController } from "./OrderController";
 
 export class UserController {
   static async getUser(email: string) {
@@ -24,7 +25,8 @@ export class UserController {
       const user = await User.findByUserEmail(email);
 
       if (user) {
-        return { orders: user.data.orders };
+        const userOrders = await OrderController.getUserOrders(user.id);
+        return { orders: userOrders, userId: user.id };
       } else {
         return { message: "User not found" };
       }
