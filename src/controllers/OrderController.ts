@@ -1,6 +1,7 @@
 import { CreatePreference } from "@/lib/mercadoPagoConn";
 import { Order } from "@/models/OrderModel";
-import { NextRequest } from "next/server";
+import { User } from "@/models/UserModel";
+import { NextRequest, NextResponse } from "next/server";
 
 // {
 //   "id": "",
@@ -57,46 +58,19 @@ export class OrderController {
     }
   }
 
-  static async processPayment(orderId: string) {
+  static async sendNotifications(data: any) {
     try {
-      const order = await Order.findById(orderId);
-
-      // Lógica para procesar el pago con MercadoPago
-
-      // Configurar la orden del comerciante
-      // const merchantOrder: MerchantOrder = {
-      //   config: client,
-      //   create: async (data: MerchantOrderCreateData) => {
-      //     // Implementa la lógica para crear la orden del comerciante aquí
-      //     // Asegúrate de devolver una instancia de MerchantOrderResponse
-      //     return new MerchantOrderResponse(/* ... */);
-      //   },
-      //   get: async (id: string) => {
-      //     // Implementa la lógica para obtener la orden del comerciante aquí
-      //     return new MerchantOrderResponse(/* ... */);
-      //   },
-      //   update: async (id: string, data: any) => {
-      //     // Implementa la lógica para actualizar la orden del comerciante aquí
-      //     // Asegúrate de devolver una instancia de MerchantOrderResponse
-      //     return new MerchantOrderResponse(/* ... */);
-      //   },
-      //   search: async (params: any) => {
-      //     // Implementa la lógica para buscar la orden del comerciante aquí
-      //     return new MerchantOrderResponse(/* ... */);
-      //   },
-      // };
-
-      // Realizar el pago
-      //const paymentResponse = await payment.createPayment(merchantOrder);
-
-      // Actualizar el estado de la orden en tu sistema
-      //order.data.paymentStatus = paymentResponse.status;
-      await order.pushData();
-
-      //return { message: "Payment processed successfully", paymentResponse };
+      const orderId = data.external_reference;
+      const orderData = await this.getOrder(orderId);
+      console.log(orderId, orderData);
+      console.log("este ese el email del user: ", orderData.userID);
+      const userData = await User.findByUserId(orderData.userID);
+      console.log(userData);
+      const userEmail = userData.data.email;
+      return "Emails sent";
     } catch (error) {
       console.error(error);
-      throw new Error("Failed to process payment");
+      return error;
     }
   }
 }
