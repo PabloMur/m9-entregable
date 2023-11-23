@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { algoliaDB } from "@/lib/algoliaConn";
+import { OrderController } from "@/controllers/OrderController";
 export async function GET(request: NextRequest, { params }: any) {
   try {
     const id = params.id;
-    const result = await algoliaDB.getObject(id);
+    const result = await OrderController.getOrder(id);
     return NextResponse.json({ response: result });
   } catch (error: any) {
     if (error.message === "Object not found") {

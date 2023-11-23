@@ -29,10 +29,12 @@ export class User {
         await user.pullData();
         return user.data.cart;
       } else {
+        console.error("El usuario no existe");
         throw new Error("El usuario no existe");
       }
     } catch (err) {
-      throw new Error("Falló el getCart en user model" + err);
+      console.error("Falló el getCart en user model:", err);
+      throw new Error("Falló el getCart en user model");
     }
   }
 
@@ -46,10 +48,12 @@ export class User {
         await user.pushData();
         return user.data.cart;
       } else {
+        console.error("El usuario no existe");
         throw new Error("El usuario no existe");
       }
     } catch (err) {
-      throw new Error("Falló el addToCart en user model" + err);
+      console.error("Falló el addToCart en user model:", err);
+      throw new Error("Falló el addToCart en user model");
     }
   }
 
@@ -73,13 +77,16 @@ export class User {
           await user.pushData();
           return newCart;
         } else {
+          console.error("El producto no está en el carrito");
           throw new Error("El producto no está en el carrito");
         }
       } else {
+        console.error("El usuario no existe");
         throw new Error("El usuario no existe");
       }
     } catch (err) {
-      throw new Error("Falló el deleteFromCart en user model" + err);
+      console.error("Falló el deleteFromCart en user model:", err);
+      throw new Error("Falló el deleteFromCart en user model");
     }
   }
 
@@ -90,7 +97,8 @@ export class User {
       newUser.data = data;
       return newUser;
     } catch (err) {
-      throw new Error("Falló al crear usuario" + err);
+      console.error("Falló al crear usuario:", err);
+      throw new Error("Falló al crear usuario");
     }
   }
 
@@ -102,31 +110,55 @@ export class User {
         myUser.data = user.data();
         return myUser;
       } else {
+        console.error("El userId no existe");
         throw new Error("El userId no existe");
       }
     } catch (err) {
-      throw new Error("Falló al buscar usuario por ID" + err);
+      console.error("Falló al buscar usuario por ID:", err);
+      throw new Error("Falló al buscar usuario por ID");
     }
   }
 
-  private static async updateUserField(
-    userId: string,
-    field: string,
-    value: any
-  ) {
+  static async findByUserEmail(email: string) {
     try {
-      const results = await collection.doc(userId).get();
-      if (results.exists) {
-        const user = new User(results.id);
-        user.data = results.data();
-        user.data[field] = value;
-        await user.pushData();
-        return user.data;
+      const result = await collection.where("email", "==", email).get();
+
+      if (!result.empty) {
+        const userDoc = result.docs[0];
+        const myUser = new User(userDoc.id);
+        myUser.data = userDoc.data();
+        return myUser;
       } else {
-        throw new Error("El usuario no existe");
+        console.error("Usuario no encontrado");
+        throw new Error("Usuario no encontrado");
+      }
+    } catch (error) {
+      console.error("Falló al buscar usuario por ID:", error);
+      throw new Error("Falló al buscar usuario por ID");
+    }
+  }
+
+  static async updateUserField(email: string, field: string, value: any) {
+    try {
+      const querySnapshot = await collection.where("email", "==", email).get();
+      if (!querySnapshot.empty) {
+        // Tomar el primer documento ya que el correo electrónico debería ser único
+        const userDoc = querySnapshot.docs[0];
+
+        const user = new User(userDoc.id);
+        user.data = userDoc.data();
+
+        // Actualizar el campo deseado
+        user.data[field] = value;
+
+        // Guardar los cambios en la base de datos
+        await user.pushData();
+
+        return user.data;
       }
     } catch (err) {
-      throw new Error("Falló al actualizar usuario" + err);
+      console.error("Falló al actualizar usuario:", err);
+      throw new Error("Falló al actualizar usuario");
     }
   }
 
