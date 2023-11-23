@@ -29,12 +29,18 @@ export class Order {
     return user ? user.data.email : null;
   }
 
-  static async createNewOrder(newOrderData: any = {}) {
+  static async createNewOrder(newOrderData: any = {}, productId: string) {
+    const orderData = {
+      ...newOrderData,
+      productId,
+      status: "pending",
+      date: new Date(),
+    };
     const newOrderSnap = await firestore
       .collection(ORDER_COLLECTION)
-      .add(newOrderData);
+      .add(orderData);
     const newOrder = new Order(newOrderSnap.id);
-    newOrder.data = newOrderData;
+    newOrder.data = orderData;
     return newOrder;
   }
 

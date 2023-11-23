@@ -1,15 +1,34 @@
-import { MercadoPagoConfig, MerchantOrder, Payment } from "mercadopago";
-import MerchantOrderCreateData from "mercadopago";
-import MerchantOrderResponse from "mercadopago";
+import { CreatePreference } from "@/lib/mercadoPagoConn";
 import { Order } from "@/models/OrderModel";
+import { NextRequest } from "next/server";
 
-const token = process.env.MERCADOPAGO_TOKEN as any;
+// {
+//   "id": "",
+//   "category_id": "car_electronics",
+//   "currency_id": "ARS",
+//   "description": "Dummy description",
+//   "picture_url": "https://http2.mlstatic.com/D_NQ_NP_664821-MCO72985288227_112023-F.jpg",
+//   "title": "Destornillador",
+//   "quantity": 1,
+//   "unit_price": 100
+// }
 
 export class OrderController {
-  static async createOrder(orderData: any) {
+  static async createOrder(request: NextRequest) {
     try {
-      const newOrder = await Order.createNewOrder(orderData);
-      return { message: "Order created successfully", orderId: newOrder.id };
+      const { orderData } = await request.json();
+      const url = new URL(request.url);
+      const productId = url.searchParams.get("productId") as string;
+      const newOrder = await Order.createNewOrder(orderData, productId);
+      const newPreference = await CreatePreference(
+        orderData.Items,
+        newOrder.id
+      );
+      return {
+        message: "Order created successfully",
+        orderId: newOrder.id,
+        preferenceResponse: newPreference,
+      };
     } catch (error) {
       console.error(error);
       throw new Error("Failed to create order");
@@ -43,11 +62,6 @@ export class OrderController {
       const order = await Order.findById(orderId);
 
       // Lógica para procesar el pago con MercadoPago
-      const client = new MercadoPagoConfig({
-        accessToken: token,
-      });
-
-      const payment = new Payment(client);
 
       // Configurar la orden del comerciante
       // const merchantOrder: MerchantOrder = {
