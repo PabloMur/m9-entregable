@@ -3,17 +3,7 @@ import { notificationsSender } from "@/tools/emailSender";
 import { Order } from "@/models/OrderModel";
 import { User } from "@/models/UserModel";
 import { NextRequest, NextResponse } from "next/server";
-
-// {
-//   "id": "",
-//   "category_id": "car_electronics",
-//   "currency_id": "ARS",
-//   "description": "Dummy description",
-//   "picture_url": "https://http2.mlstatic.com/D_NQ_NP_664821-MCO72985288227_112023-F.jpg",
-//   "title": "Destornillador",
-//   "quantity": 1,
-//   "unit_price": 100
-// }
+import yup from "yup";
 
 export class OrderController {
   static async getUserOrders(userId: string) {
@@ -27,7 +17,23 @@ export class OrderController {
   }
   static async createOrder(request: NextRequest) {
     try {
-      const { orderData } = await request.json();
+      const orderSchema = yup.object({
+        orderData: yup.object({
+          userID: yup.string().required(),
+          Items: yup
+            .array()
+            .of(
+              yup.object({
+                id: yup.string().required(),
+                title: yup.string().required(),
+                quantity: yup.number().positive().required(),
+                unit_price: yup.number().positive().required(),
+              })
+            )
+            .required(),
+        }),
+      });
+      const { orderData } = await orderSchema.validate(await request.json());
       const url = new URL(request.url);
       const productId = url.searchParams.get("productId") as string;
       const newOrder = await Order.createNewOrder(orderData, productId);
