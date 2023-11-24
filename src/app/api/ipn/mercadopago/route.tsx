@@ -13,12 +13,8 @@ export async function POST(request: NextRequest) {
   if (topic == "merchant_order") {
     const data = await GetMerchantOrder(id);
     if (data.order_status == "paid") {
-      console.log("avisar que esta pagado");
       const sendNotifications = await OrderController.sendNotifications(data);
-      return NextResponse.json(
-        { id, topic, data, sendNotifications },
-        { status: 200 }
-      );
+      return NextResponse.json({ sendNotifications }, { status: 200 });
     }
     return NextResponse.json({ id, topic, data }, { status: 200 });
   }

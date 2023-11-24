@@ -7,11 +7,15 @@ import {
   generateExpirationDate,
 } from "@/tools/emailSender";
 import { NextRequest } from "next/server";
+import yup from "yup";
 
 export class AuthController {
   static async sendCode(request: NextRequest) {
     try {
-      const { email } = await request.json();
+      const schema = yup.object({
+        email: yup.string().email().required(),
+      });
+      const { email } = await schema.validate(await request.json());
       let code = generateRandom5DigitNumber();
       const expiresAt = generateExpirationDate();
 
@@ -36,7 +40,11 @@ export class AuthController {
 
   static async generateToken(request: NextRequest) {
     try {
-      const { email, code } = await request.json();
+      const schema = yup.object({
+        email: yup.string().email().required(),
+        code: yup.number().required(),
+      });
+      const { email, code } = await schema.validate(await request.json());
       const authFound = await Auth.findByEmailAndCode(email, code);
 
       if (authFound) {

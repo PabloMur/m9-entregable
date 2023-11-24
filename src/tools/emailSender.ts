@@ -25,3 +25,12 @@ export async function emailSender(email: string, code: number) {
     console.error(error);
   }
 }
+
+export async function notificationsSender(message: any) {
+  try {
+    const emailSent = await sgMail.send(message);
+    return { sent: emailSent };
+  } catch (error) {
+    console.error(error);
+  }
+}

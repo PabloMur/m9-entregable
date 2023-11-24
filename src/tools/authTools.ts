@@ -44,7 +44,7 @@ export function generateToken(data: any) {
   });
 }
 
-export function ComparePasswords(passOne: string, passTwo: string) {
+export function comparePasswords(passOne: string, passTwo: string) {
   return passOne == passTwo;
 }
 

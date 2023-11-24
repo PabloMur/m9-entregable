@@ -6,14 +6,11 @@ export async function GET(request: NextRequest) {
   try {
     // Configuración de Airtable
     const products = await airtableBase.table("productos-m9").select().all();
-    const experimental = products.at(1);
-    console.log(experimental);
 
     // Procesar y guardar en Algolia
     const productsToSave = products.map((record) => ({
       objectID: record.id,
-      name: record.fields.name,
-      description: record.fields.description,
+      record,
     }));
 
     const algoliaResponse = await algoliaDB.saveObjects(productsToSave);
